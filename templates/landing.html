@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceCheck AI - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100vh;
+            padding: 20px;
+        }
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        .hero-btn {
+            font-size: 1.1rem;
+            padding: 15px 30px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <i class="ph-fill ph-scan" style="font-size: 80px; color: var(--primary); margin-bottom: 20px;"></i>
+        <h1>FaceCheck AI</h1>
+        <p>The next-generation smart attendance system. Automatically track class attendance using state-of-the-art Local Binary Patterns Histograms (LBPH) face recognition.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('login') }}" class="primary-btn hero-btn">
+                <i class="ph ph-sign-in"></i> Login to Portal
+            </a>
+        </div>
+    </div>
+</body>
+</html>

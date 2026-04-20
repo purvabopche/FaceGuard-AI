@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition Attendance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar glass-panel">
+            <div class="brand">
+                <i class="ph-fill ph-camera"></i>
+                <h2>FaceCheck</h2>
+            </div>
+            
+            <ul class="nav-links">
+                <li data-target="register-section" class="active">
+                    <i class="ph ph-user-plus"></i> Register
+                </li>
+                <li data-target="train-section">
+                    <i class="ph ph-brain"></i> Train System
+                </li>
+                <li data-target="attendance-section">
+                    <i class="ph ph-scan"></i> Attendance
+                </li>
+                <li data-target="view-section">
+                    <i class="ph ph-list-dashes"></i> View Records
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            
+            <!-- Register Section -->
+            <section id="register-section" class="active-section glass-panel fade-in">
+                <div class="header">
+                    <h1>Student Registration</h1>
+                    <p>Add a new student and scan their face</p>
+                </div>
+                
+                <div class="split-view">
+                    <div class="form-panel">
+                        <div class="input-group">
+                            <label>Student ID (Numeric)</label>
+                            <input type="number" id="reg-id" placeholder="e.g. 101">
+                        </div>
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input type="text" id="reg-name" placeholder="e.g. John Doe">
+                        </div>
+                        <button class="primary-btn" id="start-capture-btn">
+                            <i class="ph ph-camera"></i> Capture Face Data
+                        </button>
+                        
+                        <div id="reg-status" class="status-msg"></div>
+                        <div class="progress-bar-container" style="display:none;" id="reg-progress-container">
+                            <div class="progress-bar" id="reg-progress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="camera-panel">
+                        <div class="camera-feed-placeholder" id="reg-camera-box">
+                            <i class="ph ph-video-camera-slash"></i>
+                            <p>Camera Off</p>
+                        </div>
+                        <img id="reg-stream" class="video-stream" style="display:none;" src="" alt="Live Video">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Train Section -->
+            <section id="train-section" class="glass-panel fade-in" style="display:none;">
+                <div class="header">
+                    <h1>Train System</h1>
+                    <p>Process saved student images to teach the AI to recognize them.</p>
+                </div>
+                
+                <div class="center-card">
+                    <i class="ph-fill ph-robot hero-icon"></i>
+                    <h3>Ready to Learn</h3>
+                    <p>Make sure you have registered all students before training.</p>
+                    <button class="primary-btn pulse-btn" id="train-btn">
+                        <i class="ph ph-lightning"></i> Start Training
+                    </button>
+                    <div id="train-status" class="status-msg"></div>
+                </div>
+            </section>
+
+            <!-- Attendance Section -->
+            <section id="attendance-section" class="glass-panel fade-in" style="display:none;">
+                <div class="header">
+                    <h1>Live Attendance Tracking</h1>
+                    <p>Automatically mark attendance when registered students are recognized.</p>
+                </div>
+                
+                <div class="split-view">
+                    <div class="controls-panel">
+                        <button class="primary-btn success-btn" id="start-attendance-btn">
+                            <i class="ph ph-play-circle"></i> Start Tracking
+                        </button>
+                        <button class="secondary-btn danger-btn" id="stop-attendance-btn" disabled>
+                            <i class="ph ph-stop-circle"></i> Stop Tracking
+                        </button>
+                        
+                        <div class="info-card mt-20">
+                            <h4>Status messages</h4>
+                            <ul class="legend">
+                                <li><span class="dot green"></span> Recognized & Marked</li>
+                                <li><span class="dot yellow"></span> Already Marked</li>
+                                <li><span class="dot red"></span> Unknown Person</li>
+                            </ul>
+                        </div>
+                        <div id="att-status" class="status-msg"></div>
+                    </div>
+                    
+                    <div class="camera-panel">
+                        <div class="camera-feed-placeholder" id="att-camera-box">
+                            <i class="ph ph-video-camera-slash"></i>
+                            <p>Camera Off</p>
+                        </div>
+                        <img id="att-stream" class="video-stream" style="display:none;" src="" alt="Live Video">
+                    </div>
+                </div>
+            </section>
+
+            <!-- View Records Section -->
+            <section id="view-section" class="glass-panel fade-in" style="display:none;">
+                <div class="header">
+                    <h1>Attendance Records</h1>
+                    <p>View student attendance logs for a specific date.</p>
+                </div>
+                
+                <div class="toolbar">
+                    <div class="input-group row-group">
+                        <label>Select Date:</label>
+                        <input type="date" id="record-date">
+                        <button class="secondary-btn" id="fetch-records-btn">
+                            <i class="ph ph-magnifying-glass"></i> Search
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-body">
+                            <!-- Rows dynamically populated -->
+                            <tr><td colspan="4" class="empty-state">Select a date to view records</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

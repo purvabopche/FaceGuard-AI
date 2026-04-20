@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceCheck AI - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .login-header h2 { margin-bottom: 10px; }
+        .error-msg {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <form class="glass-panel login-box fade-in" method="POST" action="{{ url_for('login') }}">
+            <div class="login-header">
+                <i class="ph-fill ph-user-circle" style="font-size: 60px; color: var(--primary);"></i>
+                <h2>Welcome Back</h2>
+                <p style="color: var(--text-muted);">Sign in to access your dashboard</p>
+            </div>
+            
+            {% if error %}
+            <div class="error-msg">{{ error }}</div>
+            {% endif %}
+
+            <div class="input-group">
+                <label>Email ID</label>
+                <input type="email" name="email" placeholder="e.g. CS24@mits.gwl" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+            
+            <button type="submit" class="primary-btn" style="margin-top: 10px;">
+                Sign In <i class="ph ph-arrow-right"></i>
+            </button>
+            <div style="text-align: center; margin-top: 10px;">
+                 <a href="{{ url_for('landing') }}" style="color: var(--text-muted); text-decoration: none; font-size: 14px;"><i class="ph ph-arrow-left"></i> Back to Home</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

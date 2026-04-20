@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - FaceCheck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="app-container">
+        <nav class="sidebar glass-panel">
+            <div class="brand">
+                <i class="ph-fill ph-camera"></i>
+                <h2>FaceCheck</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active">
+                    <i class="ph ph-scan"></i> Face Registration
+                </li>
+            </ul>
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: var(--text-muted);">
+                    <i class="ph-fill ph-user" style="font-size: 24px;"></i>
+                    <span style="font-size: 14px; font-weight: 600;">{{ user.name }}</span>
+                </div>
+                <a href="{{ url_for('logout') }}" class="secondary-btn" style="text-decoration: none; width: 100%;">
+                    <i class="ph ph-sign-out"></i> Logout
+                </a>
+            </div>
+        </nav>
+
+        <main class="content-area">
+            <section class="active-section glass-panel fade-in">
+                <div class="header">
+                    <h1>Register Your Face</h1>
+                    <p>Submit your biometric data to enable automatic attendance.</p>
+                </div>
+                
+                <div class="split-view">
+                    <div class="form-panel">
+                        <div class="info-card" style="margin-bottom: 20px;">
+                            <h4>Verification Details</h4>
+                            <p style="color:var(--text-muted); font-size:14px; margin-bottom:5px;"><strong>Name:</strong> {{ user.name }}</p>
+                            <p style="color:var(--text-muted); font-size:14px; margin-bottom:5px;"><strong>ID:</strong> {{ user.id }}</p>
+                            <p style="color:var(--text-muted); font-size:14px;"><strong>Email:</strong> {{ user.email }}</p>
+                        </div>
+                        
+                        <button class="primary-btn pulse-btn" id="start-capture-btn">
+                            <i class="ph ph-camera"></i> Scan Face Now
+                        </button>
+                        
+                        <div id="reg-status" class="status-msg"></div>
+                        <div class="progress-bar-container" style="display:none;" id="reg-progress-container">
+                            <div class="progress-bar" id="reg-progress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="camera-panel">
+                        <div class="camera-feed-placeholder" id="reg-camera-box">
+                            <i class="ph ph-video-camera-slash"></i>
+                            <p>Camera Off</p>
+                        </div>
+                        <img id="reg-stream" class="video-stream" style="display:none;" src="" alt="Live Video">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const regBtn = document.getElementById('start-capture-btn');
+            let isRegistering = false;
+            let cameraCheckInterval;
+
+            function showStatus(message, type) {
+                const el = document.getElementById('reg-status');
+                el.className = 'status-msg show';
+                el.classList.add(`status-${type}`);
+                el.textContent = message;
+                setTimeout(() => el.classList.remove('show'), 5000);
+            }
+
+            function stopCameraFeed() {
+                fetch('/stop_camera', { method: 'POST' });
+                document.getElementById('reg-stream').style.display = 'none';
+                document.getElementById('reg-camera-box').style.display = 'flex';
+                if (cameraCheckInterval) clearInterval(cameraCheckInterval);
+                isRegistering = false;
+            }
+
+            regBtn.addEventListener('click', async () => {
+                if(isRegistering) return;
+                
+                try {
+                    const res = await fetch('/start_register', { method: 'POST' });
+                    const data = await res.json();
+                    
+                    if (res.ok) {
+                        isRegistering = true;
+                        showStatus(data.message, 'info');
+                        document.getElementById('reg-camera-box').style.display = 'none';
+                        const imgEl = document.getElementById('reg-stream');
+                        imgEl.style.display = 'block';
+                        imgEl.src = `/video_feed?t=${new Date().getTime()}`;
+                        
+                        document.getElementById('reg-progress-container').style.display = 'block';
+                        
+                        cameraCheckInterval = setInterval(async () => {
+                            const statusRes = await fetch('/registration_status');
+                            const statusData = await statusRes.json();
+                            
+                            if (statusData.complete) {
+                                clearInterval(cameraCheckInterval);
+                                isRegistering = false;
+                                showStatus(statusData.message, 'success');
+                                document.getElementById('reg-progress').style.width = '100%';
+                                
+                                setTimeout(() => {
+                                    document.getElementById('reg-progress-container').style.display = 'none';
+                                    stopCameraFeed();
+                                }, 2000);
+                            } else {
+                                const pct = (statusData.progress / statusData.total) * 100;
+                                document.getElementById('reg-progress').style.width = `${pct}%`;
+                            }
+                        }, 500);
+                        
+                    } else {
+                        showStatus(data.error, 'error');
+                    }
+                } catch (err) {
+                    showStatus('Server error.', 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
